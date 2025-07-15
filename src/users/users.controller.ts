@@ -8,6 +8,7 @@ import {
   NotFoundException,
   Delete,
   BadRequestException,
+  HttpException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserProfileDto } from './dto/user-profile.dto';
@@ -24,6 +25,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthGuard } from '../iam/login/decorators/auth-guard.decorator';
 import { AuthType } from '../iam/login/enums/auth-type.enum';
+import { LoggerService } from '../common/logger/logger.service';
 
 interface GetUserResponse {
   user: AccountsUsers;
@@ -40,13 +42,29 @@ interface UpdateResponse {
 @AuthGuard(AuthType.Bearer)
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly loggerService: LoggerService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Find all users' })
   @ApiResponse({ status: 200, description: 'Get all users' })
   public async findAllUser(): Promise<AccountsUsers[]> {
-    return this.usersService.findAll();
+    try {
+      const users = await this.usersService.findAll();
+      this.loggerService.log('Successfully fetched users', 'UsersController');
+      return users;
+    } catch (error: any) {
+      // Use error.message and error.stack directly
+      this.loggerService.error(
+        error.message || 'Unknown error',
+        error.stack,
+        'UsersController',
+      );
+
+      throw new HttpException('Users not found', HttpStatus.NOT_FOUND);
+    }
   }
 
   @Get('/:userId')

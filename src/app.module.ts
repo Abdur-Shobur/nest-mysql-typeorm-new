@@ -4,6 +4,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { IamModule } from './iam/iam.module';
+import { LoggerModule } from './common/logger/logger.module';
+import { RoleModule } from './role/role.module';
+import { RoleDevCategoryModule } from './role-dev-category/role-dev-category.module';
+import { RoleDevSubCategoryModule } from './role-dev-sub-category/role-dev-sub-category.module';
 
 @Module({
   imports: [
@@ -27,8 +31,12 @@ import { IamModule } from './iam/iam.module';
         },
       }),
     }),
+    LoggerModule,
     IamModule,
     UsersModule,
+    RoleModule,
+    RoleDevCategoryModule,
+    RoleDevSubCategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

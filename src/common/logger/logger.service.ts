@@ -1,38 +1,36 @@
-import { Injectable, Scope, LoggerService as LoggerBase } from '@nestjs/common';
-import { FastifyBaseLogger } from 'fastify';
+// src/common/logger/logger.service.ts
+import {
+  Inject,
+  Injectable,
+  LoggerService as NestLogger,
+  Scope,
+} from '@nestjs/common';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Injectable({ scope: Scope.TRANSIENT })
-export class LoggerService implements LoggerBase {
-  constructor(private readonly logger: FastifyBaseLogger) {}
+export class LoggerService implements NestLogger {
+  constructor(
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: NestLogger,
+  ) {}
 
-  private formatMessage(message: any, context?: string): string {
-    const formattedMessage =
-      typeof message === 'object' ? JSON.stringify(message) : message;
-    return context ? `${formattedMessage}` : formattedMessage;
+  log(message: string, context?: string) {
+    this.logger.log(message, context);
   }
 
-  log(message: any, context?: string) {
-    const formattedMessage = this.formatMessage(message, context);
-    this.logger.info({ context }, formattedMessage);
+  error(message: string, context?: string, trace?: string) {
+    this.logger.error(message, trace, context);
   }
 
-  error(message: any, context?: string) {
-    const formattedMessage = this.formatMessage(message, context);
-    this.logger.error({ context }, formattedMessage);
+  warn(message: string, context?: string) {
+    this.logger.warn(message, context);
   }
 
-  warn(message: any, context?: string) {
-    const formattedMessage = this.formatMessage(message, context);
-    this.logger.warn({ context }, formattedMessage);
+  debug(message: string, context?: string) {
+    this.logger.debug(message, context);
   }
 
-  debug(message: any, context?: string) {
-    const formattedMessage = this.formatMessage(message, context);
-    this.logger.debug({ context }, formattedMessage);
-  }
-
-  verbose(message: any, context?: string) {
-    const formattedMessage = this.formatMessage(message, context);
-    this.logger.trace({ context }, formattedMessage);
+  verbose(message: string, context?: string) {
+    this.logger.verbose(message, context);
   }
 }

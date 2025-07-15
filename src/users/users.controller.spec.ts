@@ -4,6 +4,8 @@ import { UserProfileDto } from './dto/user-profile.dto';
 import { UserDto } from './dto/user.dto';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
+import { LoggerService } from '@/common/logger/logger.service';
+import { loggerServiceMock } from '@/common/logger/logger.service.mock';
 
 const userDto: UserDto = {
   name: 'name #1',
@@ -42,6 +44,10 @@ describe('Users Controller', () => {
             updateUser: jest.fn(() => {}),
             deleteUser: jest.fn(() => userDto),
           },
+        },
+        {
+          provide: LoggerService,
+          useValue: loggerServiceMock,
         },
       ],
     }).compile();
